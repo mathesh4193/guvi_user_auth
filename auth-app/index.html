@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JWT Auth Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; }
+    input { display: block; margin: 5px 0; padding: 5px; width: 250px; }
+    button { margin: 10px 0 20px; padding: 5px 10px; }
+    pre { background: #f4f4f4; padding: 10px; border: 1px solid #ccc; max-width: 500px; }
+    h2 { margin-top: 40px; }
+  </style>
+</head>
+<body>
+  <h1>JWT Auth Test</h1>
+
+  <!-- REGISTER -->
+  <h2>Register</h2>
+  <input id="reg-username" placeholder="Username">
+  <input id="reg-email" placeholder="Email">
+  <input id="reg-password" type="password" placeholder="Password">
+  <button onclick="register()">Register</button>
+  <pre id="reg-result"></pre>
+
+  <!-- LOGIN -->
+  <h2>Login</h2>
+  <input id="login-email" placeholder="Email">
+  <input id="login-password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <pre id="login-result"></pre>
+
+  <!-- GET USER INFO -->
+  <h2>Get User Info</h2>
+  <button onclick="getUser()">Get Me</button>
+  <pre id="user-result"></pre>
+
+  <script>
+    // Replace with your Render server URL
+    const API_URL = 'https://your-render-url.onrender.com/api/auth';
+    let token = '';
+
+    async function register() {
+      const res = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('reg-username').value,
+          email: document.getElementById('reg-email').value,
+          password: document.getElementById('reg-password').value
+        })
+      });
+      const data = await res.json();
+      document.getElementById('reg-result').innerText = JSON.stringify(data, null, 2);
+    }
+
+    async function login() {
+      const res = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: document.getElementById('login-email').value,
+          password: document.getElementById('login-password').value
+        })
+      });
+      const data = await res.json();
+      document.getElementById('login-result').innerText = JSON.stringify(data, null, 2);
+      if(data.token) token = data.token;
+    }
+
+    async function getUser() {
+      if(!token) {
+        alert("Please login first to get token!");
+        return;
+      }
+
+      const res = await fetch(`${API_URL}/me`, {
+        method: 'GET',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await res.json();
+      document.getElementById('user-result').innerText = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
